@@ -24,20 +24,20 @@ def analyze_jobs(raw_text):
     - Embedded Systems, Firmware, Hardware-oriented Python/C++.
     - Lab Tech, Hardware Student, Product Engineering.
 
-    ### WHAT TO STICK TO (The "Trash" List):
-    - Web Development (Frontend, Backend, React, Node, etc.).
-    - Pure Software roles like App development, Java, Backend Cloud.
-    - ONLY exclude if it is clearly 100% Software with no relation to Hardware/Physics/Electronics.
+    ### LOCATION EXTRACTION RULES:
+    - **EXTRACT the location for every job.** - Look for Israeli cities: Herzliya (הרצליה), Haifa (חיפה), Tel Aviv (תל אביב), Ra'anana (רעננה), Jerusalem (ירושלים), Rehovot (רחובות), Hod Hasharon.
+    - If the text says "Israel" but no city, write "Israel".
+    - If no location is found at all, write "Unknown".
 
     ### OUTPUT RULES:
+    - Return a JSON list of objects with these EXACT keys: 
+      "title", "company", "location", "link".
     - If a job title is "System Engineering" or "Verification" - ALWAYS include it.
     - Return a JSON list of objects. Link MUST be a valid URL.
     - If no relevant jobs, return [].
 
-    RAW TEXT:
-    ---
+    ### INPUT TEXT:
     {raw_text}
-    ---
     """
 
     print(f"🤖 מנתח בעזרת {model_id}...")
