@@ -1,7 +1,7 @@
 import os
 import json
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 
 # 1. טעינת המפתח
 load_dotenv()
