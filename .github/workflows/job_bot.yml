@@ -38,15 +38,23 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python main.py
 
-      # השלב שזוכר: מעדכן את הקובץ sent_jobs.json ושומר אותו בגיטהאב למחר
+
       - name: Commit and Push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          # אם הקובץ לא קיים עדיין (ריצה ראשונה), הפקודה לא תיכשל
+          
+          # מוודא שהקובץ קיים במעקב של גיט
           git add sent_jobs.json || echo "No changes to add"
-          # ביצוע Commit רק אם יש שינויים (משרות חדשות)
-          git commit -m "Update sent jobs database [skip ci]" || echo "No changes to commit"
-          git push
+          
+          # בודק אם באמת יש מה לעשות Commit (כדי למנוע שגיאות סתם)
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update sent jobs database [skip ci]"
+            # משתמש ב-rebase כדי "להדביק" את השינוי של הבוט מעל השינויים שלך
+            git pull --rebase origin main
+            git push origin main
+          else
+            echo "No changes to commit, everything is up to date."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
