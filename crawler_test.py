@@ -1,20 +1,28 @@
 import asyncio
 from playwright.async_api import async_playwright
 
-# פשוט תוסיף כאן חברה ו-URL. זה יעבוד על הכל.
 COMPANIES = {
     "Apple": "https://jobs.apple.com/en-il/search?location=israel-ISR&key=student",
     "Intel": "https://intel.wd1.myworkdayjobs.com/External/page/1ed62136c9271001e7edf16d5d680000",
+    "Elbit": "https://elbitsystemscareer.com/jobs/?category=%D7%A1%D7%98%D7%95%D7%93%D7%A0%D7%98%D7%99%D7%9D",
+    "Refael": "https://career.rafael.co.il/search/f/T2/1/",
+    "Amazon": "https://www.amazon.jobs/content/en/teams/amazon-web-services/annapurna-labs?country%5B%5D=IL&employment-type%5B%5D=Intern",
+    "Qualcomm": "https://careers.qualcomm.com/careers?start=0&location=israel&sort_by=distance&filter_include_remote=0&filter_seniority=Intern",
+    "Marvell": "https://marvell.wd1.myworkdayjobs.com/MarvellCareers?Country=084562884af243748dad7c84c304d89a",
+    "google": "https://www.google.com/about/careers/applications/jobs/results/?category=DATA_CENTER_OPERATIONS&category=DEVELOPER_RELATIONS&category=HARDWARE_ENGINEERING&category=INFORMATION_TECHNOLOGY&category=MANUFACTURING_SUPPLY_CHAIN&category=NETWORK_ENGINEERING&category=PRODUCT_MANAGEMENT&category=PROGRAM_MANAGEMENT&category=SOFTWARE_ENGINEERING&category=TECHNICAL_INFRASTRUCTURE_ENGINEERING&category=TECHNICAL_SOLUTIONS&category=TECHNICAL_WRITING&category=USER_EXPERIENCE&employment_type=FULL_TIME&employment_type=PART_TIME&employment_type=TEMPORARY&jex=ENTRY_LEVEL&location=Israel",
+    "Microsoft": "https://apply.careers.microsoft.com/careers?hl=en&start=0&location=Israel&pid=1970393556734780&sort_by=distance&filter_include_remote=1&filter_seniority=Intern",
+    "KLA": "https://kla.wd1.myworkdayjobs.com/Search?Country=084562884af243748dad7c84c304d89a&jobFamilyGroup=bcb876733f86019037b304ff551bb91e",
+    "Applied Materials": "https://careers.appliedmaterials.com/careers?domain=appliedmaterials.com&triggerGoButton=false&start=0&pid=790314788018&sort_by=relevance&filter_country=Israel&filter_seniority=Intern",
+
 }
 
 
 async def get_generic_job_data(page, url):
-    """מנוע גנרי ששולף את כל הקישורים והטקסטים הרלוונטיים מהדף"""
+
     try:
         await page.goto(url, wait_until="networkidle", timeout=60000)
-        await asyncio.sleep(5)  # זמן טעינה לאלמנטים דינמיים
+        await asyncio.sleep(5)
 
-        # סקריפט JS שרץ בתוך הדפדפן ושולף את כל הלינקים שיש בהם טקסט
         job_elements = await page.evaluate('''() => {
             const links = Array.from(document.querySelectorAll('a'));
             return links
@@ -25,7 +33,6 @@ async def get_generic_job_data(page, url):
                 .filter(l => l.text.length > 5 && l.href.startsWith('http'));
         }''')
 
-        # הופך את הרשימה לטקסט אחד ארוך שה-AI יבין בקלות
         formatted_text = ""
         for item in job_elements:
             formatted_text += f"Title: {item['text']} | URL: {item['href']}\n"
@@ -46,7 +53,7 @@ async def run_crawler():
         all_data = ""
 
         for name, url in COMPANIES.items():
-            print(f"🚀 סורק את {name} (גנרי)...")
+            print(f"🚀 סורק את {name} ...")
             data = await get_generic_job_data(page, url)
             all_data += f"\n--- COMPANY: {name} ---\n{data}\n"
             print(f"✅ {name} נסרקה.")
@@ -55,7 +62,7 @@ async def run_crawler():
             f.write(all_data)
 
         await browser.close()
-        print("\n✨ הסריקה הגנרית הסתיימה בהצלחה.")
+        print("\n✨ הסריקה הסתיימה בהצלחה.")
 
 
 if __name__ == "__main__":
