@@ -9,6 +9,11 @@ on:
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
+    # הוספת הרשאות כתיבה כדי שהבוט יוכל לעדכן את קובץ ה-JSON ב-Repository
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,3 +35,16 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python main.py
+
+      # השלב שזוכר: מעדכן את הקובץ sent_jobs.json ושומר אותו בגיטהאב למחר
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # אם הקובץ לא קיים עדיין (ריצה ראשונה), הפקודה לא תיכשל
+          git add sent_jobs.json || echo "No changes to add"
+          # ביצוע Commit רק אם יש שינויים (משרות חדשות)
+          git commit -m "Update sent jobs database [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
